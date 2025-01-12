@@ -7,6 +7,7 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
 use function PHPUnit\Framework\returnSelf;
 
@@ -37,7 +38,10 @@ class UserController extends Controller
      */
     public function create()
     {
-        return Inertia::render('User/Create');
+        $roles=Role::orderby('name','asc')->get();
+        return Inertia::render('User/Create',[
+            'roles'=>$roles
+        ]);
     }
 
     /**

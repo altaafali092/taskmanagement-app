@@ -20,7 +20,7 @@ const Index = ({ auth, roles, flash = {} }) => {
             flash.toast._handled = true;
         }
     }, [flash]);
-    const deleteTask = (task) => {
+    const deleteTask = (role) => {
         if (!window.confirm('Are You sure want to Delete ?')) {
             return;
         }
@@ -51,9 +51,9 @@ const Index = ({ auth, roles, flash = {} }) => {
                                 <thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border-b-2 border-gray-500'>
                                     <tr>
                                         <th className='px-3 py-2'>ID</th>
-                                        <th className='px-3 py-2'>Name</th>
+                                        <th className='px-3 py-2'>Role Name</th>
                                         <th className='px-3 py-2'>Permissions </th>
-                                        <th className='px-3 py-2'>CreatedAt</th>
+                                        <th className='px-3 py-2'>Created_At</th>
                                         <th className='px-3 py-2'>Action</th>
                                     </tr>
                                 </thead>

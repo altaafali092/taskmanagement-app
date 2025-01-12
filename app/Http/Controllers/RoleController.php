@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Role\StoreRoleRequest;
+use App\Http\Requests\Role\UpdateRoleRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
@@ -61,17 +62,34 @@ class RoleController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Role $role)
     {
-        //
+        $permissions = Permission::orderBy('name', 'ASC')->get(); // Get all permissions
+        $hasPermissions = $role->permissions->pluck('name')->toArray();
+
+        return Inertia::render('Roles/Edit', [
+            'role' => $role,
+            'permissions' => $permissions,
+            'hasPermissions' => $hasPermissions, // Pass the role's permissions to the frontend
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateRoleRequest $request, Role $role)
     {
-        //
+        $role->update($request->validated());
+
+        if (!empty($request->permission)) {
+            $role->syncPermissions($request->permission);
+        } else {
+            $role->syncPermissions([]);
+        } // Sync permissions by IDs
+        return to_route('role.index')->with('toast', [
+            'type' => 'success',
+            'message' => 'Role updated successfully!',
+        ]);
     }
 
     /**
@@ -79,7 +97,8 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
-        $role->syncPermissions([]);  
+
+        $role->syncPermissions([]);
         $role->delete();
         return back()->with(
             'toast',

@@ -8,7 +8,7 @@ import TextInput from '@/Components/TextInput'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 
 const Edit = ({ auth, task, projects,users }) => {
-    console.log
+  
     const { data, setData, post, errors, processing } = useForm({
         image: task.image || '', // Ensure initial state is null for file input
         name: task.name || '',
