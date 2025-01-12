@@ -3,8 +3,10 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        <link rel="icon" href="/asset/image/th.jpeg" type="image/png" />
+        <meta name="theme-color" content="#1BB566" />
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
+
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
