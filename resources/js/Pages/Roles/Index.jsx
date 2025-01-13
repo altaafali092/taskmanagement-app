@@ -1,12 +1,15 @@
-import Pagination from '@/Components/Pagination';
+
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import React, { useEffect } from 'react';
+import Pagination from '@/Components/Pagination'
+
 
 import { Button } from '@headlessui/react';
 import { toast, ToastContainer } from 'react-toastify';
 
 const Index = ({ auth, roles, flash = {} }) => {
+   
     useEffect(() => {
         if (flash.toast && !flash.toast._handled) {
             const { type, message } = flash.toast;
@@ -59,33 +62,32 @@ const Index = ({ auth, roles, flash = {} }) => {
                                 </thead>
 
                                 <tbody>
-                                    {roles.data.map((role, idx) => (
+                                    {roles.map((role) => (
                                         <tr className='bg-white border-b dark:bg-gray-800 dark:border-gray-600' key={role.id}>
                                             <td className='px-3 py-2'>{role.id}</td>
                                             <td className='px-3 py-2'>{role.name}</td>
                                             <td className='px-3 py-2'>
                                                 {role.permissions.map((permission) => (
-                                                    <span key={permission.id} className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold mr-1 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-900">
+                                                    <span key={permission.id} className="m-1 inline-block bg-blue-100 text-blue-800 text-xs font-semibold mr-1 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-900">
                                                         {permission.name}
                                                     </span>
                                                 ))}
                                             </td>
-
                                             <td className='px-3 py-2'>{role.created_at}</td>
                                             <td className='px-3 py-2 flex'>
                                                 <Link href={route('role.edit', role)} className='font-medium bg-slate-50 px-2 py-0.5 text-blue-600 dark:text-blue-500 hover:underlin mx-1 rounded-lg'>Edit</Link>
-                                                <Button onClick={(e) => deleteTask(role)} className='font-medium text-red-600
-                                                 dark:text-white hover:underlin mx-1 bg-red-400 px-2 py-0.5
-                                                  rounded-lg'>
+                                                <Button onClick={(e) => deleteTask(role)} className='font-medium text-red-600 dark:text-white hover:underlin mx-1 bg-red-400 px-2 py-0.5 rounded-lg'>
                                                     Delete
                                                 </Button>
                                             </td>
                                         </tr>
                                     ))}
 
+
                                 </tbody>
                             </table>
                             {/* <Pagination links={roles.meta.links} /> */}
+
                         </div>
                     </div>
                 </div>

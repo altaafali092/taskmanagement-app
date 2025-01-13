@@ -20,8 +20,19 @@ class PermissionsSeeder extends Seeder
             'edit users',
             'delete users',
             'create users',
-            'manage roles',
-            'manage permissions',
+            'view tasks',
+            'edit tasks',
+            'delete tasks',
+            'create tasks',
+            'view projects',
+            'edit projects',
+            'delete projects',
+            'create projects',
+            'view roles',
+            'edit roles',
+            'delete roles',
+            'create roles',
+
         ];
 
         // Create permissions
@@ -29,13 +40,6 @@ class PermissionsSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Create roles and assign permissions
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $userRole = Role::firstOrCreate(['name' => 'user']);
 
-        // Assign all permissions to admin
-        $adminRole->syncPermissions($permissions);
-
-        $userRole->syncPermissions(['view users']);
     }
 }

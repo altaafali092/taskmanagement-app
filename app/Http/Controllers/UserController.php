@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -20,13 +21,8 @@ class UserController extends Controller
     {
 
         $query = User::query();
-        if (request('name')) {
-            $query->where('name', 'like', '%' . request('name') . '%');
-        }
-        if (request('email')) {
-            $query->where('email', request('email'));
-        }
-        $users = UserResource::collection($query->with(['createdBy', 'updatedBy'])->latest()->paginate(5));
+
+        $users = UserResource::collection($query->with(['createdBy', 'updatedBy','roles'])->latest()->paginate(5));
         return Inertia::render('User/Index', [
             'users' => fn() => $users,
             'queryParams' => request()->query() ?: null,
@@ -38,9 +34,9 @@ class UserController extends Controller
      */
     public function create()
     {
-        $roles=Role::orderby('name','asc')->get();
-        return Inertia::render('User/Create',[
-            'roles'=>$roles
+        $roles = Role::orderby('name', 'asc')->get();
+        return Inertia::render('User/Create', [
+            'roles' => $roles
         ]);
     }
 
@@ -49,12 +45,15 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        User::create(array_merge(
+       $user=User::create(array_merge(
             $request->validated(),
             ['password' => bcrypt($request->password)]
         ));
-
-        return to_route('user.index')->with('success', 'User created successfully.');
+        $user->syncRoles($request->role);
+        return to_route('user.index')->with('toast', [
+            'type' => 'success',
+            'message' => 'User created successfully.'
+        ]);
     }
 
 
@@ -71,19 +70,27 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return Inertia::render('User/Edit', compact('user'));
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
+        $roles = Role::orderBy('name', 'ASC')->get();
+        $hasRoles = $user->roles->pluck('name')->toArray();
+        return Inertia::render('User/Edit', [
+            'user' => $user,
+            'roles' => $roles,
+            'hasRoles' => $hasRoles,
+        ]);
+    }
     public function update(UpdateUserRequest $request, User $user)
     {
+
         $user->update(array_merge(
             $request->validated(),
             $request->filled('password') ? ['password' => bcrypt($request->password)] : []
         ));
-        return to_route('user.index')->with('success', 'User updated successfully.');
+        $user->syncRoles($request->role);
+        return to_route('user.index')->with('toast', [
+            'type' => 'success',
+            'message' => 'User updated successfully.'
+        ]);
     }
 
 
@@ -92,6 +99,26 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+
+        if ($user->id == Auth::user()->id) {
+
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You cannot delete yourself.'
+            ]);
+        }
+        if ($user->hasRole('Super Admin')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You cannot delete Super Admin.'
+            ]);
+        }
+        if ($user->status === 1) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'User deleted successfully.'
+            ]);
+        }
         $user->delete();
         return back();
     }

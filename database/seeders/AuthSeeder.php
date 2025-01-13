@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class AuthSeeder extends Seeder
@@ -14,15 +15,17 @@ class AuthSeeder extends Seeder
      */
     public function run(): void
     {
-        // $superAdminRole = Role::firstOrCreate(['name' => 'superadmin']);
+        $superAdminRole = Role::firstOrCreate(['name' => 'superadmin']);
 
-         User::factory()->create([
+       $user=User::firstOrCreate([
             'name' => 'Super Admin',
             'email' => 'admin@admin.com',
             'password' => bcrypt('password'),
         ]);
 
-
-        // $user->assignRole($superAdminRole);
+        $user->assignRole($superAdminRole);
+        $permissions = Permission::all();
+        // Assign all permissions to the superadmin role
+        $superAdminRole->syncPermissions($permissions);
     }
 }

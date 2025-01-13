@@ -19,6 +19,10 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'created_at' => $this->created_at->diffForHumans(),
+            'roles' => $this->whenLoaded('roles', function () {
+                return $this->roles->pluck('name'); // Return only role names (or customize as needed)
+            }),
+
             // 'updated_at' => $this->updated_at->diffForHumans(),
             // 'projects' => ProjectResource::collection($this->whenLoaded('projects')),
         ];

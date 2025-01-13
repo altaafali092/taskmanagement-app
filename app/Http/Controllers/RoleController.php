@@ -16,7 +16,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::with('permissions')->orderBy('name', 'asc')->latest()->paginate(10);
+        $roles = Role::with('permissions')->orderBy('name', 'asc')->latest()->get();
         return Inertia::render('Roles/Index', [
             'roles' => $roles
         ]);
@@ -64,6 +64,12 @@ class RoleController extends Controller
      */
     public function edit(Role $role)
     {
+        if($role->name==='superadmin'){
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'Superadmin role cannot be edit!'
+            ]);
+        }
         $permissions = Permission::orderBy('name', 'ASC')->get(); // Get all permissions
         $hasPermissions = $role->permissions->pluck('name')->toArray();
 
@@ -98,6 +104,12 @@ class RoleController extends Controller
     public function destroy(Role $role)
     {
 
+        if($role->name==='superadmin'){
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'Superadmin role cannot be deleted!'
+            ]);
+        }
         $role->syncPermissions([]);
         $role->delete();
         return back()->with(
