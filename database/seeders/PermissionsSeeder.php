@@ -20,14 +20,17 @@ class PermissionsSeeder extends Seeder
             'edit users',
             'delete users',
             'create users',
+
             'view tasks',
             'edit tasks',
             'delete tasks',
             'create tasks',
+
             'view projects',
             'edit projects',
             'delete projects',
             'create projects',
+
             'view roles',
             'edit roles',
             'delete roles',

@@ -20,6 +20,13 @@ class TaskController extends Controller
      */
     public function index()
     {
+        if (!Auth::user()->can('view tasks')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to access task.',
+            ]);
+        }
+
         $query = Task::query();
         if (request('name')) {
             $query->where('name', 'like', '%' . request('name') . '%');
@@ -39,6 +46,12 @@ class TaskController extends Controller
      */
     public function create()
     {
+        if (!Auth::user()->can('create tasks')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to create task.',
+            ]);
+        }
         $projects = ProjectResource::collection(Project::latest()->get())->toArray(request());
         $users = UserResource::collection(User::latest()->get())->toArray(request());
         return Inertia::render('Task/Create',[
@@ -52,6 +65,13 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
+        if (!Auth::user()->can('create tasks')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to create task.',
+            ]);
+        }
+
         Task::create($request->validated()+['created_by'=> Auth::user()->id,'updated_by'=> Auth::user()->id]);
 
         return to_route('task.index')->with('toast', [
@@ -65,6 +85,13 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
+        if (!Auth::user()->can('view tasks')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to show task.',
+            ]);
+        }
+
         return Inertia::render('Task/Show', [
             'task' => new TaskResource($task)
         ]);
@@ -75,6 +102,13 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
+        if (!Auth::user()->can('edit tasks')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to edit task.',
+            ]);
+        }
+
         $projects = ProjectResource::collection(Project::latest()->get())->toArray(request());
         $users = UserResource::collection(User::latest()->get())->toArray(request());
 
@@ -91,6 +125,13 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
+        if (!Auth::user()->can('edit tasks')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to update task.',
+            ]);
+        }
+
         $data = $request->validated();
         $data['updated_by'] = Auth::user()->id;
         $task->update($data);
@@ -106,6 +147,13 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
+        if (!Auth::user()->can('delete tasks')) {
+           return back()->with('toast',[
+            'type' => 'error',
+            'message' => 'You are not allowed to delete tasks.',
+           ]);
+        }
+
         $task->delete();
         return back()->with('toast', [
             'type' => 'success',
@@ -114,6 +162,13 @@ class TaskController extends Controller
     }
     public function myTask()
     {
+        if (!Auth::user()->can('view tasks')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to access task.',
+            ]);
+        }
+
 
         $user = auth()->user();
         $query = Task::query()->where('assigned_user_id', $user->id);

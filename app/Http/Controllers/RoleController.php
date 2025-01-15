@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Role\StoreRoleRequest;
 use App\Http\Requests\Role\UpdateRoleRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -16,6 +17,12 @@ class RoleController extends Controller
      */
     public function index()
     {
+        if (!Auth::user()->can('view roles')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to access role.',
+            ]);
+        }
         $roles = Role::with('permissions')->orderBy('name', 'asc')->latest()->get();
         return Inertia::render('Roles/Index', [
             'roles' => $roles
@@ -27,6 +34,12 @@ class RoleController extends Controller
      */
     public function create()
     {
+        if (!Auth::user()->can('create role')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to create role.',
+            ]);
+        }
         $permissions = Permission::orderBy('name', 'asc')->get();
         return Inertia::render('Roles/Create', [
             'permissions' => $permissions
@@ -38,6 +51,12 @@ class RoleController extends Controller
      */
     public function store(StoreRoleRequest $request)
     {
+        if (!Auth::user()->can('create role')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to create role.',
+            ]);
+        }
 
         $role = Role::create($request->validated());
         if (!empty($request->permission)) {
@@ -64,6 +83,12 @@ class RoleController extends Controller
      */
     public function edit(Role $role)
     {
+        if (!Auth::user()->can('edit role')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to edit role.',
+            ]);
+        }
         if($role->name==='superadmin'){
             return back()->with('toast', [
                 'type' => 'error',
@@ -85,6 +110,12 @@ class RoleController extends Controller
      */
     public function update(UpdateRoleRequest $request, Role $role)
     {
+        if (!Auth::user()->can('edit role')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to edit role.',
+            ]);
+        }
         $role->update($request->validated());
 
         if (!empty($request->permission)) {
@@ -103,6 +134,12 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
+        if (!Auth::user()->can('delete role')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to edit role.',
+            ]);
+        }
 
         if($role->name==='superadmin'){
             return back()->with('toast', [

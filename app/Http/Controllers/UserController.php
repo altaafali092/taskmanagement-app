@@ -19,6 +19,12 @@ class UserController extends Controller
      */
     public function index()
     {
+        if (!Auth::user()->can('view users')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to view user.',
+            ]);
+        }
 
         $query = User::query();
 
@@ -34,6 +40,12 @@ class UserController extends Controller
      */
     public function create()
     {
+        if (!Auth::user()->can('create users')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to create user.',
+            ]);
+        }
         $roles = Role::orderby('name', 'asc')->get();
         return Inertia::render('User/Create', [
             'roles' => $roles
@@ -45,6 +57,12 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
+        if (!Auth::user()->can('create users')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to create user.',
+            ]);
+        }
        $user=User::create(array_merge(
             $request->validated(),
             ['password' => bcrypt($request->password)]
@@ -70,6 +88,12 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        if (!Auth::user()->can('edit users')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to edit user.',
+            ]);
+        }
 
         $roles = Role::orderBy('name', 'ASC')->get();
         $hasRoles = $user->roles->pluck('name')->toArray();
@@ -82,6 +106,12 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
 
+        if (!Auth::user()->can('edit users')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to edit user.',
+            ]);
+        }
         $user->update(array_merge(
             $request->validated(),
             $request->filled('password') ? ['password' => bcrypt($request->password)] : []
@@ -99,6 +129,12 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        if (!Auth::user()->can('delete users')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to delete user.',
+            ]);
+        }
 
         if ($user->id == Auth::user()->id) {
 

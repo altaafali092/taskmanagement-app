@@ -2,6 +2,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
+import { hasPermission } from '@/Utils/Permissions';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -30,24 +31,24 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Dashboard
                                 </NavLink>
-                                <NavLink
-                                    href={route('project.index')}
-                                    active={route().current('project.index')}
-                                >
-                                    Project
-                                </NavLink>
-                                <NavLink
-                                    href={route('task.index')}
-                                    active={route().current('task.index')}
-                                >
-                                    Tasks
-                                </NavLink>
-                                <NavLink
-                                    href={route('user.index')}
-                                    active={route().current('user.index')}
-                                >
-                                    Users
-                                </NavLink>
+                                {hasPermission(user, 'view projects') && (
+                                    <NavLink
+                                        href={route('project.index')}
+                                        active={route().current('project.index')}
+                                    >
+                                        Project
+                                    </NavLink>
+                                )}
+
+                                {hasPermission('view tasks') && (
+                                    <NavLink
+                                        href={route('task.index')}
+                                        active={route().current('task.index')}
+                                    >
+                                        Tasks
+                                    </NavLink>
+                                )}
+
                                 <NavLink
                                     href={route('task.mytask')}
                                     active={route().current('task.mytask')}
@@ -55,12 +56,23 @@ export default function AuthenticatedLayout({ header, children }) {
                                     My Tasks
                                 </NavLink>
 
-                                <NavLink
-                                    href={route('role.index')}
-                                    active={route().current('role.index')}
-                                >
-                                    Role and Permission
-                                </NavLink>
+                                {hasPermission('view roles') && (
+                                    <NavLink
+                                        href={route('role.index')}
+                                        active={route().current('role.index')}
+                                    >
+                                        Role and Permission
+                                    </NavLink>
+                                )}
+
+                                {hasPermission('view roles') && (
+                                    <NavLink
+                                        href={route('user.index')}
+                                        active={route().current('user.index')}
+                                    >
+                                        Users
+                                    </NavLink>
+                                )}
 
 
                             </div>

@@ -6,29 +6,37 @@ use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
-use GuzzleHttp\Psr7\Message;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Routing\Controller;
 
 class ProjectController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $query =Project ::query();
-        if(request('name')){
-            $query->where('name','like','%'.request('name').'%');
+        if (!Auth::user()->can('view projects')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to access Project.',
+            ]);
         }
-        if(request('status')){
-            $query->where('status',request('status'));
+
+        $query = Project::query();
+        if (request('name')) {
+            $query->where('name', 'like', '%' . request('name') . '%');
         }
-        $projects = ProjectResource::collection($query->with(['createdBy','updatedBy'])->latest()->paginate(5));
+        if (request('status')) {
+            $query->where('status', request('status'));
+        }
+        $projects = ProjectResource::collection($query->with(['createdBy', 'updatedBy'])->latest()->paginate(5));
         return Inertia::render('Project/Index', [
-            'projects' => fn()=> $projects,
-            'queryParams' =>request()->query() ?: null,
+            'projects' => fn() => $projects,
+            'queryParams' => request()->query() ?: null,
         ]);
     }
 
@@ -38,6 +46,12 @@ class ProjectController extends Controller
      */
     public function create()
     {
+        if (!Auth::user()->can('create projects')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to create Project.',
+            ]);
+        }
         return Inertia::render('Project/Create');
     }
 
@@ -46,13 +60,18 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
+        if (!Auth::user()->can('create projects')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to create Project.',
+            ]);
+        }
 
-        Project::create($request->validated()+ ['created_by'=>Auth::id(),'updated_by'=>Auth::id()]);
+        Project::create($request->validated() + ['created_by' => Auth::id(), 'updated_by' => Auth::id()]);
         return to_route('project.index')->with('toast', [
             'type' => 'success',
             'message' => ' 🦄 Data saved successfully!',
         ]);
-
     }
 
     /**
@@ -60,7 +79,14 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        return Inertia::render('Project/Show',[
+        if (!Auth::user()->can('view projects')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to show Project.',
+            ]);
+        }
+
+        return Inertia::render('Project/Show', [
             'project' => new ProjectResource($project)
         ]);
     }
@@ -70,7 +96,13 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        return Inertia::render('Project/Edit',compact('project'));
+        if (!Auth::user()->can('edit projects')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to edit Project.',
+            ]);
+        }
+        return Inertia::render('Project/Edit', compact('project'));
     }
 
     /**
@@ -78,11 +110,17 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
+        if (!Auth::user()->can('edit projects')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to update Project.',
+            ]);
+        }
 
         $project->update($request->validated());
-        return to_route('project.index')->with('toast',[
-            'type'=>'success',
-            'message'=>'Project updated successfully'
+        return to_route('project.index')->with('toast', [
+            'type' => 'success',
+            'message' => 'Project updated successfully'
         ]);
     }
 
@@ -91,17 +129,19 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
+        if (!Auth::user()->can('delete projects')) {
+            return back()->with('toast', [
+                'type' => 'error',
+                'message' => 'You are not allowed to delete Project.',
+            ]);
+        }
         if ($project->image) {
             Storage::delete($project->image);
         }
         $project->delete();
-        return back()->with('toast',[
-            'type'=>'success',
-            'message'=>'Project deleted successfully'
+        return back()->with('toast', [
+            'type' => 'success',
+            'message' => 'Project deleted successfully'
         ]);
-    }
-    public function test()
-    {
-        return "This is a test method";
     }
 }
