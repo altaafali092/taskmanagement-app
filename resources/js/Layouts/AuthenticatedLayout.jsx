@@ -40,7 +40,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </NavLink>
                                 )}
 
-                                {hasPermission('view tasks') && (
+
+                                {hasPermission(user, 'view tasks') && (
                                     <NavLink
                                         href={route('task.index')}
                                         active={route().current('task.index')}
@@ -48,15 +49,16 @@ export default function AuthenticatedLayout({ header, children }) {
                                         Tasks
                                     </NavLink>
                                 )}
+                                {hasPermission(user, 'view tasks') && (
+                                    <NavLink
+                                        href={route('task.mytask')}
+                                        active={route().current('task.mytask')}
+                                    >
+                                        My Tasks
+                                    </NavLink>
+                                )}
 
-                                <NavLink
-                                    href={route('task.mytask')}
-                                    active={route().current('task.mytask')}
-                                >
-                                    My Tasks
-                                </NavLink>
-
-                                {hasPermission('view roles') && (
+                                {hasPermission(user, 'view roles') && (
                                     <NavLink
                                         href={route('role.index')}
                                         active={route().current('role.index')}
@@ -65,7 +67,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </NavLink>
                                 )}
 
-                                {hasPermission('view roles') && (
+                                {hasPermission(user, 'view roles') && (
                                     <NavLink
                                         href={route('user.index')}
                                         active={route().current('user.index')}
